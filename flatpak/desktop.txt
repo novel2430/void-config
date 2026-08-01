@@ -1,0 +1,5 @@
+com.tencent.WeChat
+com.spotify.Client
+org.onlyoffice.desktopeditors
+com.dingtalk.DingTalk
+com.baidu.NetDisk

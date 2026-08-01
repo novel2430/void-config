@@ -1,0 +1,4 @@
+# 不允许与 NetworkManager 同时管理网络。
+
+dhcpcd
+wpa_supplicant

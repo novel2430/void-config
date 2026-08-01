@@ -1,0 +1,38 @@
+# Window Manager
+wayfire
+
+# Desktop integration
+dbus
+elogind
+polkit
+mesa-dri
+xdg-desktop-portal
+xdg-desktop-portal-gtk
+xdg-desktop-portal-wlr
+dejavu-fonts-ttf
+papirus-icon-theme
+wqy-microhei
+
+# Audio
+pipewire
+wireplumber
+alsa-pipewire
+
+# Tools
+swaybg
+rofi
+dunst
+Waybar
+fcitx5
+fcitx5-configtool
+fcitx5-zhuyin
+fcitx5-chewing
+fcitx5-chinese-addons
+network-manager-applet
+playerctl
+brightnessctl
+wl-clipboard
+grim
+slurp
+cliphist
+wlopm

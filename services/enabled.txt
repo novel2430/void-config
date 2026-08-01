@@ -1,0 +1,7 @@
+# 顺序有意义：依赖服务放前面。
+
+dbus
+NetworkManager
+elogind
+sshd
+mihomo

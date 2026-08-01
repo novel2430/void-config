@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+
+# =====================================================================
+# 優先步驟 1：立刻宣告並強制匯入 D-Bus 環境變數（這必須是腳本的第一件事！）
+# =====================================================================
+export XDG_CURRENT_DESKTOP=wlroots
+dbus-update-activation-environment WAYLAND_DISPLAY XDG_CURRENT_DESKTOP DISPLAY XAUTHORITY DBUS_SESSION_BUS_ADDRESS
+
+# =====================================================================
+# 優先步驟 2：物理性清理並重啟 Portal（徹底杜絕偶發性死鎖）
+# =====================================================================
+killall -q xdg-desktop-portal xdg-desktop-portal-wlr xdg-desktop-portal-gtk xdg-document-portal
+sleep 0.5 # 給系統半秒鐘反應時間
+
+# =====================================================================
+# 優先步驟 3：啟動音訊（PipeWire 也很依賴正確的 D-Bus 變數）
+# =====================================================================
+killall -q pipewire wireplumber pipewire-pulse
+/usr/bin/pipewire &
+/usr/bin/wireplumber &
+/usr/bin/pipewire-pulse &
+
+# =====================================================================
+# 剩餘步驟：原本的週邊與外掛設定（現在它們可以安全地連上完美的 D-Bus 了）
+# =====================================================================
+# start-wm $WAYLAND_DISPLAY
+
+swaybg -i $HOME/.local/share/pics/wallpaper -m fill &
+dunst &
+wl-paste --watch cliphist store &
+waybar -c $HOME/.config/wayfire/waybar.jsonc -s $HOME/.config/wayfire/waybar.css &
+
+gsettings set org.gnome.desktop.wm.preferences button-layout ':minimize,maximize,close'
+gsettings set org.gnome.desktop.interface gtk-theme 'Adwaita-dark'
+gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark'
+gsettings set org.gnome.desktop.interface icon-theme 'Papirus'
+
+fcitx5 --replace -d &
+nm-applet &
+
+# flatpak override --user --env=LD_PRELOAD=/app/lib/wemeet/libhook.so com.tencent.wemeet &
+# kill -TERM $(pgrep -f idle-lock-guard) 2>/dev/null; idle-lock-guard > $HOME/.log/idle-lock-guard/idle-lock-guard.log 2>&1 &
+
+if [ ! -z "${WLR_RANDR_CLI}" ]; then
+  eval "$WLR_RANDR_CLI"
+fi

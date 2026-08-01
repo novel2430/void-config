@@ -1,0 +1,10 @@
+#!/bin/sh
+
+MIHOMO_DIR=/home/novel2430/clash
+
+exec 2>&1
+
+exec chpst \
+    -u novel2430:novel2430 \
+    -C "$MIHOMO_DIR" \
+    /usr/local/bin/mihomo -d "$MIHOMO_DIR"

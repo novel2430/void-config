@@ -1,0 +1,34 @@
+# Native development
+base-devel
+cmake
+meson
+ninja
+pkg-config
+clang
+gdb
+cargo
+
+# Languages and tools
+python3
+
+# Dependency
+libpkgconf
+pkgconf
+expat-devel
+bzip2-devel
+libpng-devel
+brotli-devel
+freetype-devel
+libuuid-devel
+fontconfig-devel
+openssl-devel
+xcb-util-image-devel
+wayland-devel
+wayland-protocols
+libinput-devel
+wlroots0.19-devel
+vala-devel
+glib-devel
+libgee-devel
+granite7-devel
+libarchive-devel

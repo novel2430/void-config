@@ -1,0 +1,13 @@
+alacritty
+nemo
+nemo-extensions
+nemo-fileroller
+firefox-esr
+obs
+pwvucontrol
+vlc
+celluloid
+gedit
+evince
+file-roller
+chromium

@@ -1,0 +1,20 @@
+[user]
+    name = novel2430
+    email = novel2430@163.com
+
+[core]
+    editor = nvim
+
+[init]
+    defaultBranch = main
+
+[pull]
+    rebase = false
+
+[push]
+    default = simple
+
+[color]
+    ui = auto
+[safe]
+	directory = *

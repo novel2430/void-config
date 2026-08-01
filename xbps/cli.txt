@@ -1,0 +1,8 @@
+# Some CLI Tools
+fastfetch
+flatpak
+flatpak-builder
+yazi
+eza
+tree-sitter-cli
+lswt

@@ -1,0 +1,4 @@
+# Global overrides applied to every user Flatpak application.
+#
+# Keep this file minimal.
+# Do not grant every application access to home or host.

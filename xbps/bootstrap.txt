@@ -1,0 +1,4 @@
+NetworkManager
+base-system
+grub-x86_64-efi
+vim

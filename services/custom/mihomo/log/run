@@ -1,0 +1,10 @@
+#!/bin/sh
+
+LOG_DIR=/var/log/mihomo
+
+mkdir -p "$LOG_DIR"
+chown novel2430:novel2430 "$LOG_DIR"
+
+exec chpst \
+    -u novel2430:novel2430 \
+    svlogd -tt "$LOG_DIR"

@@ -1,0 +1,140 @@
+#!/usr/bin/env bash
+# airlock: a lightweight managed-install framework prototype.
+#
+# This entrypoint wires together all library modules and dispatches
+# user commands to the framework core.
+
+set -Eeuo pipefail
+shopt -s inherit_errexit 2>/dev/null || true
+
+AIRLOCK_BASE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+export AIRLOCK_BASE_DIR
+
+# shellcheck source=../lib/config.sh
+. "$AIRLOCK_BASE_DIR/lib/config.sh"
+# shellcheck source=../lib/logging.sh
+. "$AIRLOCK_BASE_DIR/lib/logging.sh"
+# shellcheck source=../lib/ui.sh
+. "$AIRLOCK_BASE_DIR/lib/ui.sh"
+# shellcheck source=../lib/utils.sh
+. "$AIRLOCK_BASE_DIR/lib/utils.sh"
+# shellcheck source=../lib/simple_helper.sh
+. "$AIRLOCK_BASE_DIR/lib/simple_helper.sh"
+# shellcheck source=../lib/env.sh
+. "$AIRLOCK_BASE_DIR/lib/env.sh"
+# shellcheck source=../lib/validate.sh
+. "$AIRLOCK_BASE_DIR/lib/validate.sh"
+# shellcheck source=../lib/defaults.sh
+. "$AIRLOCK_BASE_DIR/lib/defaults.sh"
+# shellcheck source=../lib/pipeline.sh
+. "$AIRLOCK_BASE_DIR/lib/pipeline.sh"
+# shellcheck source=../lib/record.sh
+. "$AIRLOCK_BASE_DIR/lib/record.sh"
+# shellcheck source=../lib/commit.sh
+. "$AIRLOCK_BASE_DIR/lib/commit.sh"
+# shellcheck source=../lib/remove.sh
+. "$AIRLOCK_BASE_DIR/lib/remove.sh"
+# shellcheck source=../lib/core.sh
+. "$AIRLOCK_BASE_DIR/lib/core.sh"
+
+al_load_config
+
+# Global state for error reporting
+AIRLOCK_CURRENT_RECIPE=""
+AIRLOCK_CURRENT_STAGE=""
+_AL_ERR_TRAP_FIRED=0
+
+al_err_trap() {
+  local code=$?
+  if [ "$_AL_ERR_TRAP_FIRED" -ne 0 ]; then
+    return
+  fi
+  _AL_ERR_TRAP_FIRED=1
+
+  printf '\n' >&2
+  printf '%s\n' "[ERROR] Recipe: ${AIRLOCK_CURRENT_RECIPE:-unknown}" >&2
+  printf '%s\n' "[ERROR] Stage: ${AIRLOCK_CURRENT_STAGE:-unknown}" >&2
+  printf '%s\n' "[ERROR] Command: $BASH_COMMAND" >&2
+  printf '%s\n' "[ERROR] Exit code: $code" >&2
+  printf '%s\n' "[ERROR] Location: ${BASH_SOURCE[1]:-unknown}:${BASH_LINENO}" >&2
+  if [ -n "${WORKDIR:-}" ]; then
+    printf '%s\n' "[ERROR] Work directory preserved at: $WORKDIR" >&2
+  else
+    printf '%s\n' "[ERROR] Work directory: not initialized" >&2
+  fi
+  if [ -n "${STAGE_DIR:-}" ]; then
+    printf '%s\n' "[ERROR] Stage directory preserved at: $STAGE_DIR" >&2
+  else
+    printf '%s\n' "[ERROR] Stage directory: not initialized" >&2
+  fi
+}
+
+trap al_err_trap ERR
+
+show_usage() {
+  printf '%sUsage%s\n' "$AL_UI_BOLD$AL_UI_CYAN" "$AL_UI_RESET"
+  printf '  %sairlock install%s <recipe-name|recipe-path>\n' "$AL_UI_CYAN" "$AL_UI_RESET"
+  printf '  %sairlock install%s <recipe-name|recipe-path> %s--force%s\n' "$AL_UI_CYAN" "$AL_UI_RESET" "$AL_UI_DIM" "$AL_UI_RESET"
+  printf '  %sairlock remove%s <pkg-name>\n' "$AL_UI_CYAN" "$AL_UI_RESET"
+  printf '  %sairlock list%s [%s--time-asc%s|%s--time-desc%s]\n' "$AL_UI_CYAN" "$AL_UI_RESET" "$AL_UI_DIM" "$AL_UI_RESET" "$AL_UI_DIM" "$AL_UI_RESET"
+  printf '  %sairlock info%s <pkg-name>\n' "$AL_UI_CYAN" "$AL_UI_RESET"
+  printf '  %sairlock files%s <pkg-name>\n' "$AL_UI_CYAN" "$AL_UI_RESET"
+  printf '  %sairlock clean-cache%s <recipe-name|recipe-path>\n' "$AL_UI_CYAN" "$AL_UI_RESET"
+
+  printf '\n%sEnvironment overrides%s\n' "$AL_UI_BOLD$AL_UI_CYAN" "$AL_UI_RESET"
+  printf '  %sAIRLOCK_PREFIX%s: %s\n' "$AL_UI_BOLD$AL_UI_BLUE" "$AL_UI_RESET" "$AIRLOCK_PREFIX"
+  printf '  %sAIRLOCK_DB_ROOT%s: %s\n' "$AL_UI_BOLD$AL_UI_BLUE" "$AL_UI_RESET" "$AIRLOCK_DB_ROOT"
+  printf '  %sAIRLOCK_RECIPES_DIR%s: %s\n' "$AL_UI_BOLD$AL_UI_BLUE" "$AL_UI_RESET" "$AIRLOCK_RECIPES_DIR"
+  printf '  %sAIRLOCK_TMPDIR%s: %s\n' "$AL_UI_BOLD$AL_UI_BLUE" "$AL_UI_RESET" "$AIRLOCK_TMPDIR"
+  printf '  %sAIRLOCK_LOG_LEVEL%s: %s\n' "$AL_UI_BOLD$AL_UI_BLUE" "$AL_UI_RESET" "$AIRLOCK_LOG_LEVEL"
+  printf '  %sAIRLOCK_LOG_FILE%s: %s\n' "$AL_UI_BOLD$AL_UI_BLUE" "$AL_UI_RESET" "$AIRLOCK_LOG_FILE"
+  printf '  %sAIRLOCK_FORCE%s: %s\n' "$AL_UI_BOLD$AL_UI_BLUE" "$AL_UI_RESET" "$AIRLOCK_FORCE"
+  printf '  %sAIRLOCK_UI_COLOR%s: %s\n' "$AL_UI_BOLD$AL_UI_BLUE" "$AL_UI_RESET" "${AIRLOCK_UI_COLOR:-1}"
+}
+
+cmd="${1:-}"
+if [ $# -gt 0 ]; then
+  shift
+fi
+
+case "$cmd" in
+  install)
+    target="${1:-}"
+    shift || true
+    AIRLOCK_FORCE=0
+    while [ $# -gt 0 ]; do
+      case "$1" in
+        --force)
+          AIRLOCK_FORCE=1
+          ;;
+        *)
+          al_die "Unknown install option: $1"
+          ;;
+      esac
+      shift
+    done
+    export AIRLOCK_FORCE
+    al_install_target "$target"
+    ;;
+  clean-cache)
+    al_clean_cache "${1:-}"
+    ;;
+  remove)
+    al_remove_pkg "${1:-}"
+    ;;
+  list)
+    al_list_pkgs "$@"
+    ;;
+  info)
+    al_show_pkg_info "${1:-}"
+    ;;
+  files)
+    al_show_pkg_files "${1:-}"
+    ;;
+  help|-h|--help|'')
+    show_usage
+    ;;
+  *)
+    al_die "Unknown command: $cmd"
+    ;;
+esac

@@ -1,0 +1,47 @@
+# Web Browser
+super + shift + f
+  firefox
+
+# Lock
+super + shift + l
+  my-i3lock
+
+# Clipboard
+super + c
+  greenclip-rofi
+
+# Screenshot
+Print
+  maim-screenshot full
+super + Print
+  maim-screenshot
+
+# Powermenu
+super + shift + p
+  rofi-power-menu
+
+# Volume
+XF86AudioRaiseVolume
+  my-volume up
+XF86AudioLowerVolume
+  my-volume down
+XF86AudioMute
+  my-volume mute
+
+# Brightness
+XF86MonBrightnessUp
+  brightnessctl set 10%+
+XF86MonBrightnessDown
+  brightnessctl set 10%-
+
+# Playerctl
+XF86AudioPlay
+  playerctl play-pause
+XF86AudioNext
+  playerctl next
+XF86AudioPrev
+  playerctl previous
+
+# Reload Sxhkd
+super + shift + r
+  killall -r sxhkd; sxhkd &

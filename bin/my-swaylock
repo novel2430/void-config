@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 indicator_radius=80
 indicator_thickness=7
 b_color="3e5f44"
@@ -5,6 +7,16 @@ f_color="5e936c"
 text_f_color="eceff4"
 wrong_color="bf616a"
 lock_img="$HOME/.local/share/pics/wallpaper"
+
+"$HOME/.local/bin/my-swayidle" &
+swayidle_pid=$!
+cleanup() {
+    if kill -0 "$swayidle_pid" 2>/dev/null; then
+        kill "$swayidle_pid"
+        wait "$swayidle_pid" 2>/dev/null
+    fi
+}
+trap cleanup EXIT INT TERM HUP
 
 swaylock \
         --ignore-empty-password \

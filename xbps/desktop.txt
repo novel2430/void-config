@@ -38,3 +38,4 @@ cliphist
 wlopm
 wlr-randr
 i3lock-color
+swayidle

@@ -12,8 +12,6 @@ xdg-desktop-portal-wlr
 dejavu-fonts-ttf
 papirus-icon-theme
 wqy-microhei
-noto-fonts-ttf
-noto-fonts-cjk
 noto-fonts-emoji
 
 # Audio

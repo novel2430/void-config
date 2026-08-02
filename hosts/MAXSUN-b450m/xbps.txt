@@ -1,3 +1,8 @@
 # This file may remain empty.
 timeshift
 cronie
+
+# Driver Stuff
+intel-video-accel
+libva-utils
+intel-gpu-tools

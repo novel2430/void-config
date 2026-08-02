@@ -23,7 +23,6 @@ killall -q pipewire wireplumber pipewire-pulse
 # =====================================================================
 # 剩餘步驟：原本的週邊與外掛設定（現在它們可以安全地連上完美的 D-Bus 了）
 # =====================================================================
-# start-wm $WAYLAND_DISPLAY
 
 swaybg -i $HOME/.local/share/pics/wallpaper -m fill &
 dunst &
@@ -31,7 +30,7 @@ wl-paste --watch cliphist store &
 waybar -c $HOME/.config/wayfire/waybar.jsonc -s $HOME/.config/wayfire/waybar.css &
 
 gsettings set org.gnome.desktop.wm.preferences button-layout ':minimize,maximize,close'
-gsettings set org.gnome.desktop.interface gtk-theme 'Adwaita-dark'
+gsettings set org.gnome.desktop.interface gtk-theme 'Adwaita'
 gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark'
 gsettings set org.gnome.desktop.interface icon-theme 'Papirus'
 

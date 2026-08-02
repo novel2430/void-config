@@ -1,1 +1,2 @@
 # Applications installed only
+net.agalwood.Motrix

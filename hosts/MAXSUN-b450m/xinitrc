@@ -1,16 +1,15 @@
+export XCURSOR_THEME="Bibata-Modern-Classic"
+export XCURSOR_SIZE="24"
+export XCURSOR_PATH="$HOME/.local/share/icons:$HOME/.icons:/usr/local/share/icons:/usr/share/icons:/usr/share/pixmaps"
+
 xrdb ~/.Xresources
-
-# xrandr --output DisplayPort-0 \
-#  --mode 1920x1080 --rotate left --left-of HDMI-A-0 \
-#  --output HDMI-A-0 \
-#  --mode 1920x1080 --primary
-
+xsetroot -cursor_name left_ptr
 
 xrandr --output DP-1 --mode 1920x1080 --primary
 xrandr --output DP-3 --rotate left --left-of DP-1 --mode 1920x1080 --verbose
 
 
+exec dbus-launch --exit-with-session dwm
 # exec dbus-run-session openbox-session
-exec dbus-run-session awesome
-# exec dbus-launch --exit-with-session dwm
+# exec dbus-run-session awesome
 # exec dbus-run-session /home/novel2430/src/dwm/dwm

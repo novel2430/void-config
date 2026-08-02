@@ -13,6 +13,9 @@ export XMODIFIERS=@im=fcitx
 export SDL_IM_MODULE=fcitx
 export GLFW_IM_MODULE=ibus
 
+# Cursor
+export XCURSOR_PATH="$HOME/.local/share/icons:$HOME/.icons:/usr/local/share/icons:/usr/share/icons:/usr/share/pixmaps"
+
 # wlr-randr monitor settings
 # export WLR_RANDR_CLI="wlr-randr --output DP-3 --mode 1920x1080@60 --transform 90 --pos 0,0 && wlr-randr --output DP-1 --mode 1920x1080@60 --transform normal --pos 1080,0"
 

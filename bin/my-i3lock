@@ -15,7 +15,7 @@ lock_img="$HOME/.local/share/pics/wallpaper"
 
 
 trap revert_dpms HUP INT TERM
-xset +dpms dpms 0 0 300
+xset +dpms dpms 0 0 60
 
 i3lock --nofork \
         --ignore-empty-password \

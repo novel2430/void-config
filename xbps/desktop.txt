@@ -12,6 +12,9 @@ xdg-desktop-portal-wlr
 dejavu-fonts-ttf
 papirus-icon-theme
 wqy-microhei
+noto-fonts-ttf
+noto-fonts-cjk
+noto-fonts-emoji
 
 # Audio
 pipewire
@@ -25,6 +28,10 @@ dunst
 Waybar
 fcitx5
 fcitx5-configtool
+fcitx5-gtk
+fcitx5-gtk+2
+fcitx5-gtk+3
+fcitx5-gtk4
 fcitx5-zhuyin
 fcitx5-chewing
 fcitx5-chinese-addons
@@ -37,5 +44,14 @@ slurp
 cliphist
 wlopm
 wlr-randr
-i3lock-color
 swayidle
+
+# X11
+xinit
+xauth
+feh
+sxhkd
+xsetroot
+xrdb
+i3lock-color
+xclip

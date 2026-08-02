@@ -34,3 +34,11 @@ granite7-devel
 libarchive-devel
 libgomp-devel
 pam-devel
+
+## Xlibre
+libxkbfile-devel
+libXfont2-devel
+libxcvt-devel
+libxshmfence-devel
+libunwind-devel
+xcb-util-keysyms-devel

@@ -3,7 +3,7 @@
 # This recipe demonstrates the minimal v0 metadata and per-stage overrides.
 
 pkg_name="xlibre"
-pkg_version="25.2.2"
+pkg_version="25.1.9"
 pkg_mode="managed"
 pkg_type="source"
 
@@ -35,8 +35,8 @@ stage_configure() {
     -D glamor=true \
     -D udev=true \
     -D dtrace=false \
-    -D systemd_logind=false \
-    -D seatd_libseat=true \
+    -D systemd_logind=true \
+    -D seatd_libseat=false \
     -D suid_wrapper=true \
     -D linux_acpi=false \
     -D legacy_nvidia_padding=true \
@@ -56,7 +56,7 @@ stage_stage() {
   al_stage_install_wrapper "bin/xlibre-run" <<EOF
 #!/usr/bin/env bash
 if [ -e "$XLIBRE_PREFIX_DIR/bin/X" ]; then
-  startx -- $XLIBRE_PREFIX_DIR/bin/X "\$@"
+  startx -- $XLIBRE_PREFIX_DIR/bin/X "\$@" -keeptty
 fi
 EOF
 

@@ -1,10 +1,7 @@
-# void-repo-multilib
-# void-repo-multilib-nonfree
-
 mesa-vulkan-intel
 mesa-dri-32bit
 mesa-vulkan-intel-32bit
 vulkan-loader-32bit
-
+steam
 gamescope
 lutris

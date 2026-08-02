@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 pkg_name="wemeet"
-pkg_version="b01e69a"
+pkg_version="c6327e5"
 pkg_mode="tracked"
 pkg_type="artifact"
 track_backend="flatpak"

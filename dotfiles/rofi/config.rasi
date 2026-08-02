@@ -1,7 +1,7 @@
 * {
   background-color: #3e5f44;
   text-color: #eceff4;
-  font: "Hack Nerd Font Regular 15";
+  font: "DejaVuSansM Nerd Font Mono 15";
   padding: 0px;
 }
 configuration {

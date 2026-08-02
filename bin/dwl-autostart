@@ -4,7 +4,8 @@
 # 優先步驟 1：立刻宣告並強制匯入 D-Bus 環境變數（這必須是腳本的第一件事！）
 # =====================================================================
 export XDG_CURRENT_DESKTOP=wlroots
-dbus-update-activation-environment WAYLAND_DISPLAY XDG_CURRENT_DESKTOP DISPLAY XAUTHORITY DBUS_SESSION_BUS_ADDRESS
+dbus-update-activation-environment WAYLAND_DISPLAY XDG_CURRENT_DESKTOP DISPLAY XAUTHORITY DBUS_SESSION_BUS_ADDRESS \
+  XCURSOR_THEME XCURSOR_SIZE XCURSOR_PATH
 
 # =====================================================================
 # 優先步驟 2：物理性清理並重啟 Portal（徹底杜絕偶發性死鎖）
@@ -23,7 +24,6 @@ killall -q pipewire wireplumber pipewire-pulse
 # =====================================================================
 # 剩餘步驟：原本的週邊與外掛設定（現在它們可以安全地連上完美的 D-Bus 了）
 # =====================================================================
-# start-wm $WAYLAND_DISPLAY
 
 swaybg -i $HOME/.local/share/pics/wallpaper -m fill &
 dunst &
@@ -31,7 +31,7 @@ wl-paste --watch cliphist store &
 waybar -c $HOME/.config/dwl/waybar.jsonc -s $HOME/.config/dwl/waybar.css &
 
 gsettings set org.gnome.desktop.wm.preferences button-layout ':minimize,maximize,close'
-gsettings set org.gnome.desktop.interface gtk-theme 'Adwaita-dark'
+gsettings set org.gnome.desktop.interface gtk-theme 'Adwaita'
 gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark'
 gsettings set org.gnome.desktop.interface icon-theme 'Papirus'
 

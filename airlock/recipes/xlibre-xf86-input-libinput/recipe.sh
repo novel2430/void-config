@@ -22,7 +22,7 @@ stage_prepare() {
 }
 
 stage_configure() {
-  export PKG_CONFIG_PATH="$XLIBRE_PREFIX_DIR/lib/x86_64-linux-gnu/pkgconfig/"
+  export PKG_CONFIG_PATH="$XLIBRE_PREFIX_DIR/lib/pkgconfig/"
   rm -rf "$BUILDDIR"
   meson setup "$BUILDDIR" "$SRCDIR" --prefix="$XLIBRE_PREFIX_DIR" 
 }

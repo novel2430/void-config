@@ -1,0 +1,2 @@
+org.shotcut.Shotcut
+org.audacityteam.Audacity

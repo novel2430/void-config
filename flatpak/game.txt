@@ -1,5 +1,8 @@
 com.valvesoftware.Steam
 org.ppsspp.PPSSPP
-org.shotcut.Shotcut
 com.vysp3r.ProtonPlus
 org.freedesktop.Platform.VulkanLayer.gamescope//25.08
+
+io.github.ryubing.Ryujinx
+org.azahar_emu.Azahar
+net.supertuxkart.SuperTuxKart

@@ -6,3 +6,4 @@ yazi
 eza
 tree-sitter-cli
 lswt
+ffmpeg

@@ -1,0 +1,6 @@
+xrdb ~/.Xresources
+
+# exec dbus-run-session openbox-session
+# exec dbus-run-session awesome
+exec dbus-launch --exit-with-session dwm
+# exec dbus-run-session /home/novel2430/src/dwm/dwm

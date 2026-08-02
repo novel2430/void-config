@@ -1,0 +1,19 @@
+# Export
+export PATH=$HOME/.local/share/flatpak/exports/bin:$HOME/.local/bin:/usr/sbin:$PATH
+export EDITOR=nvim
+export TERM=xterm-256color
+export XDG_DATA_DIRS=$HOME/.local/share/flatpak/exports/share:/var/lib/flatpak/exports/share:$HOME/.local/share:/usr/local/share:/usr/share
+export http_proxy=http://127.0.0.1:7890
+export https_proxy=http://127.0.0.1:7890
+
+# Fcitx
+export GTK_IM_MODULE=fcitx
+export QT_IM_MODULE=fcitx
+export XMODIFIERS=@im=fcitx
+export SDL_IM_MODULE=fcitx
+export GLFW_IM_MODULE=ibus
+
+# wlr-randr monitor settings
+# export WLR_RANDR_CLI="wlr-randr --output DP-3 --mode 1920x1080@60 --transform 90 --pos 0,0 && wlr-randr --output DP-1 --mode 1920x1080@60 --transform normal --pos 1080,0"
+
+alias conda-active='eval "$(/home/novel2430/.local/opt/miniconda3/bin/conda shell.zsh hook)"'

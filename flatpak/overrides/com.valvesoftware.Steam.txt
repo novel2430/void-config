@@ -1,0 +1,2 @@
+--filesystem=/static_data/Games/Steam:create
+--env=PATH=/usr/lib/extensions/vulkan/gamescope/bin:/app/bin:/usr/bin

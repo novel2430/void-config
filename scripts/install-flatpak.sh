@@ -7,50 +7,80 @@ SCRIPT_DIR="$(
 )"
 
 PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
+
 FLATPAK_DIR="$PROJECT_ROOT/flatpak"
+HOSTS_DIR="$PROJECT_ROOT/hosts"
+HOST_SELECTOR_FILE="$PROJECT_ROOT/.host"
 
 FLATHUB_NAME="flathub"
-
-# 使用官方 .flatpakrepo 初始化 remote 和导入 GPG key。
-FLATHUB_REPO_FILE="${FLATHUB_REPO_FILE:-https://dl.flathub.org/repo/flathub.flatpakrepo}"
-
-# 实际下载地址切换到 SJTUG 中国镜像。
-FLATHUB_MIRROR_URL="${FLATHUB_MIRROR_URL:-https://dl.flathub.org/repo}"
+FLATHUB_REPO_FILE="https://dl.flathub.org/repo/flathub.flatpakrepo"
+FLATHUB_OFFICIAL_URL="https://dl.flathub.org/repo"
 
 dry_run=false
+include_host_extra=false
+host_name=""
 categories=()
 
 usage() {
     cat <<'EOF'
 Usage:
   install-flatpak.sh
+  install-flatpak.sh --host void-vm
   install-flatpak.sh desktop
   install-flatpak.sh desktop development
+  install-flatpak.sh --host-extra desktop
   install-flatpak.sh --dry-run
-  install-flatpak.sh --dry-run media
+  install-flatpak.sh --dry-run --host void-vm
+
+Default behavior:
+  When no category arguments are provided, read:
+
+    hosts/<host>/flatpak.categories
+    hosts/<host>/flatpak.txt
+
+  The category file selects shared manifests from:
+
+    flatpak/<category>.txt
+
+Host resolution order:
+  1. --host NAME
+  2. VOID_CONFIG_HOST environment variable
+  3. .host file in the project root
+  4. System short hostname
+
+Explicit category behavior:
+  When categories are explicitly provided, only those shared category
+  manifests are processed.
+
+  Use --host-extra to additionally include:
+
+    hosts/<host>/flatpak.txt
 
 Behavior:
-  - Uses per-user Flatpak installation.
-  - Uses the official Flathub repository file to initialize the remote.
-  - Changes the Flathub download URL to the SJTUG China mirror.
-  - Without category arguments, reads every *.txt manifest directly
-    under the flatpak directory.
+  - Uses the per-user Flatpak installation.
+  - Uses only the official Flathub repository.
+  - Restores an existing Flathub remote to the official URL if needed.
   - Installs only applications that are not already installed.
   - Does not update, remove, or reset existing applications.
+  - Ignores empty lines and lines beginning with #.
 
-Manifest format:
-  - One complete Flatpak application ID per line.
-  - Empty lines are ignored.
-  - Lines beginning with # are ignored.
+Options:
+  --host NAME
+      Select a host profile explicitly.
 
-Examples:
-  org.gimp.GIMP
-  org.mozilla.firefox
-  com.visualstudio.code
+  --host-extra
+      Include the host-specific flatpak.txt when explicit categories
+      are provided.
 
-Environment overrides:
-  FLATHUB_REPO_FILE
-  FLATHUB_MIRROR_URL
+  --dry-run
+      Print planned operations without changing Flatpak.
+
+  -h, --help
+      Show this help.
+
+Environment:
+  VOID_CONFIG_HOST
+      Select the host profile when --host is not supplied.
 EOF
 }
 
@@ -82,33 +112,54 @@ read_manifest() {
     ' "$manifest"
 }
 
+validate_name() {
+    local kind="$1"
+    local value="$2"
+
+    [[ "$value" =~ ^[A-Za-z0-9._-]+$ ]] ||
+        die "Invalid $kind name: $value"
+}
+
+resolve_host() {
+    if [[ -n "$host_name" ]]; then
+        :
+    elif [[ -n "${VOID_CONFIG_HOST:-}" ]]; then
+        host_name="$VOID_CONFIG_HOST"
+    elif [[ -f "$HOST_SELECTOR_FILE" ]]; then
+        host_name="$(
+            read_manifest "$HOST_SELECTOR_FILE" |
+                head -n 1
+        )"
+    else
+        host_name="$(hostname -s)"
+    fi
+
+    [[ -n "$host_name" ]] ||
+        die "Unable to determine the host profile"
+
+    validate_name host "$host_name"
+}
+
 print_command() {
     printf '  '
     printf '%q ' "$@"
     printf '\n'
 }
 
-discover_categories() {
-    local manifest
-    local filename
-
-    shopt -s nullglob
-
-    for manifest in "$FLATPAK_DIR"/*.txt; do
-        filename="$(basename "$manifest")"
-        printf '%s\n' "${filename%.txt}"
-    done
+normalize_url() {
+    local url="$1"
+    printf '%s\n' "${url%/}"
 }
 
 remote_exists() {
-    flatpak remote-list \
+    flatpak remotes \
         --user \
         --columns=name 2>/dev/null |
         grep -Fxq "$FLATHUB_NAME"
 }
 
 get_remote_url() {
-    flatpak remote-list \
+    flatpak remotes \
         --user \
         --columns=name,url 2>/dev/null |
         awk -v remote="$FLATHUB_NAME" '
@@ -119,21 +170,17 @@ get_remote_url() {
         '
 }
 
-normalize_url() {
-    local url="$1"
-    printf '%s\n' "${url%/}"
-}
-
 configure_flathub_remote() {
     local current_url=""
     local normalized_current=""
-    local normalized_target=""
+    local normalized_official=""
 
-    printf '\nConfiguring Flathub user remote:\n'
+    printf '\nConfiguring official Flathub user remote:\n'
 
     if ! remote_exists; then
         printf '  Flathub remote is not configured.\n'
-        printf '  Initializing it from the official repository file.\n'
+        printf '  Adding the official Flathub remote:\n'
+        printf '    %s\n' "$FLATHUB_REPO_FILE"
 
         if "$dry_run"; then
             print_command \
@@ -142,58 +189,61 @@ configure_flathub_remote() {
                 --if-not-exists \
                 "$FLATHUB_NAME" \
                 "$FLATHUB_REPO_FILE"
-
-            printf '  Setting mirror URL:\n'
-            printf '    %s\n' "$FLATHUB_MIRROR_URL"
-
-            print_command \
-                flatpak remote-modify \
+        else
+            flatpak remote-add \
                 --user \
-                "--url=$FLATHUB_MIRROR_URL" \
-                "$FLATHUB_NAME"
-
-            return 0
+                --if-not-exists \
+                "$FLATHUB_NAME" \
+                "$FLATHUB_REPO_FILE"
         fi
 
-        flatpak remote-add \
-            --user \
-            --if-not-exists \
-            "$FLATHUB_NAME" \
-            "$FLATHUB_REPO_FILE"
+        return 0
     fi
 
     current_url="$(get_remote_url)"
     normalized_current="$(normalize_url "$current_url")"
-    normalized_target="$(normalize_url "$FLATHUB_MIRROR_URL")"
+    normalized_official="$(normalize_url "$FLATHUB_OFFICIAL_URL")"
 
-    if [[ "$normalized_current" == "$normalized_target" ]]; then
-        printf '  Flathub already uses the configured mirror:\n'
+    if [[ "$normalized_current" == "$normalized_official" ]]; then
+        printf '  Flathub already uses the official repository:\n'
         printf '    %s\n' "$current_url"
         return 0
     fi
 
-    printf '  Current URL:\n'
+    printf '  Current non-official URL:\n'
     printf '    %s\n' "${current_url:-unknown}"
 
-    printf '  New mirror URL:\n'
-    printf '    %s\n' "$FLATHUB_MIRROR_URL"
+    printf '  Restoring official URL:\n'
+    printf '    %s\n' "$FLATHUB_OFFICIAL_URL"
 
     if "$dry_run"; then
         print_command \
             flatpak remote-modify \
             --user \
-            "--url=$FLATHUB_MIRROR_URL" \
+            "--url=$FLATHUB_OFFICIAL_URL" \
             "$FLATHUB_NAME"
     else
         flatpak remote-modify \
             --user \
-            "--url=$FLATHUB_MIRROR_URL" \
+            "--url=$FLATHUB_OFFICIAL_URL" \
             "$FLATHUB_NAME"
     fi
 }
 
 while (($# > 0)); do
     case "$1" in
+        --host)
+            (($# >= 2)) ||
+                die "--host requires a host name"
+
+            host_name="$2"
+            shift
+            ;;
+
+        --host-extra)
+            include_host_extra=true
+            ;;
+
         --dry-run)
             dry_run=true
             ;;
@@ -216,46 +266,82 @@ while (($# > 0)); do
 done
 
 command -v flatpak >/dev/null 2>&1 ||
-    die "flatpak is not installed. Add it to xbps/bootstrap.txt first."
+    die "flatpak is not installed; add it to xbps/bootstrap.txt first"
 
 [[ -d "$FLATPAK_DIR" ]] ||
     die "Flatpak manifest directory not found: $FLATPAK_DIR"
 
-if ((${#categories[@]} == 0)); then
-    mapfile -t categories < <(
-        discover_categories | sort -u
-    )
-fi
+resolve_host
+
+HOST_DIR="$HOSTS_DIR/$host_name"
+HOST_CATEGORY_FILE="$HOST_DIR/flatpak.categories"
+HOST_APP_FILE="$HOST_DIR/flatpak.txt"
+
+profile_mode=false
 
 if ((${#categories[@]} == 0)); then
-    die "No Flatpak manifest files found in: $FLATPAK_DIR"
+    profile_mode=true
+    include_host_extra=true
+
+    [[ -f "$HOST_CATEGORY_FILE" ]] ||
+        die "Host category file not found: $HOST_CATEGORY_FILE"
+
+    mapfile -t categories < <(
+        read_manifest "$HOST_CATEGORY_FILE"
+    )
 fi
 
 temporary_app_list="$(mktemp)"
 trap 'rm -f "$temporary_app_list"' EXIT
 
-printf 'Selected Flatpak categories:\n'
+printf 'Flatpak installation profile\n'
+printf '  Host: %s\n' "$host_name"
 
-for category in "${categories[@]}"; do
-    manifest="$FLATPAK_DIR/$category.txt"
+if "$profile_mode"; then
+    printf '  Mode: host profile\n'
+else
+    printf '  Mode: explicit categories\n'
+fi
 
-    [[ -f "$manifest" ]] ||
-        die "Manifest not found: $manifest"
+printf '\nSelected categories:\n'
 
-    printf '  %s\n' "$category"
+if ((${#categories[@]} == 0)); then
+    printf '  None\n'
+else
+    for category in "${categories[@]}"; do
+        validate_name category "$category"
 
-    read_manifest "$manifest" >> "$temporary_app_list"
-done
+        manifest="$FLATPAK_DIR/$category.txt"
+
+        [[ -f "$manifest" ]] ||
+            die "Manifest not found: $manifest"
+
+        printf '  %s\n' "$category"
+
+        read_manifest "$manifest" >> "$temporary_app_list"
+    done
+fi
+
+if "$include_host_extra"; then
+    printf '\nHost-specific manifest:\n'
+
+    if [[ -f "$HOST_APP_FILE" ]]; then
+        printf '  %s\n' "$HOST_APP_FILE"
+        read_manifest "$HOST_APP_FILE" >> "$temporary_app_list"
+    else
+        printf '  None\n'
+    fi
+fi
 
 mapfile -t requested_apps < <(
     sort -u "$temporary_app_list"
 )
 
-# 即使清单暂时为空，也先确保 Flathub 和镜像配置正确。
+# 即使清单为空，也确保 Flathub remote 使用官方地址。
 configure_flathub_remote
 
 if ((${#requested_apps[@]} == 0)); then
-    printf '\nNo applications found in the selected manifests.\n'
+    printf '\nNo applications found in selected manifests.\n'
 
     if "$dry_run"; then
         printf 'Dry run completed. No changes were made.\n'
@@ -333,7 +419,8 @@ flatpak install \
 printf '\nFlatpak installation completed.\n'
 
 printf '\nConfigured Flathub remote:\n'
-flatpak remote-list \
+
+flatpak remotes \
     --user \
     --columns=name,url |
     awk -v remote="$FLATHUB_NAME" '

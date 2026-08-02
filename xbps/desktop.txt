@@ -36,3 +36,5 @@ grim
 slurp
 cliphist
 wlopm
+wlr-randr
+i3lock-color

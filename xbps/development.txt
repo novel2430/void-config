@@ -32,3 +32,5 @@ glib-devel
 libgee-devel
 granite7-devel
 libarchive-devel
+libgomp-devel
+pam-devel

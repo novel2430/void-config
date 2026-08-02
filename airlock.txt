@@ -1,0 +1,8 @@
+hack-nerd-fonts
+latex-chinese-fonts
+mihomo
+rustup
+my-dwl
+annotator
+swaylock-effects
+wezterm

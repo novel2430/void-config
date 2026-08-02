@@ -31,6 +31,4 @@ stage_build() {
 stage_stage() {
   DESTDIR="$STAGE_DIR" meson install -C "$BUILDDIR"
   mkdir -p "$STAGE_DIR$PREFIX/usr/share"
-  cp -r --verbose "$STAGE_DIR/usr/share/bash-completion" "$STAGE_DIR$PREFIX/share/bash-completion"
-  rm -rf "$STAGE_DIR/usr/share/bash-completion"
 }

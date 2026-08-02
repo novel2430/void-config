@@ -1,0 +1,8 @@
+# Shared XBPS categories used by this host.
+
+bootstrap
+base
+cli
+development
+desktop
+gui

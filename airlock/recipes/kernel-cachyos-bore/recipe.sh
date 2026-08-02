@@ -5,8 +5,8 @@ pkg_version="7.1"
 pkg_mode="managed"
 pkg_type="source"
 
-MINOR_VER=4
-VER=2
+MINOR_VER=5
+VER=1
 
 SRCNAME="cachyos-${pkg_version}.${MINOR_VER}-${VER}"
 ARCHIVE_FILE="$pkg_version.tar.gz"
@@ -106,13 +106,13 @@ stage_configure() {
       find /boot \
         -maxdepth 1 \
         -type f \
-        -name 'config-6.12.*+deb13-amd64' \
+        -name 'config-6.18.41_1' \
         -print \
         -quit
     )"
 
     test -n "$config_src" || {
-      echo "Debian base kernel config not found"
+      echo "base kernel config not found"
       exit 1
     }
 

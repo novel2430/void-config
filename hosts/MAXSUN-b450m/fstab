@@ -1,0 +1,15 @@
+UUID=cb9d3808-0c80-4106-835c-51ee5909c71b / ext4 defaults 0 1
+UUID=fbcb3270-7ff0-4865-ae24-11b025f3b152 /home ext4 defaults 0 2
+UUID=f4d14a8e-4b3e-4097-aafb-90094c3f1933 none swap defaults 0 0
+UUID=03B7-A112 /boot/efi vfat defaults 0 2
+tmpfs /tmp tmpfs defaults,nosuid,nodev 0 0
+
+UUID=832c2d44-f56c-4b04-91ff-e35fec5b598b /static_data ext4 defaults 0 2
+/static_data/Documents /home/novel2430/Documents none bind 0 0
+/static_data/Downloads /home/novel2430/Downloads none bind 0 0
+/static_data/Pictures /home/novel2430/Pictures none bind 0 0
+/static_data/Videos /home/novel2430/Videos none bind 0 0
+
+UUID=e93a2d66-ab03-48e9-8e24-1bcbc2e3806e /static_data/Games ext4 defaults 0 2
+/static_data/Games /home/novel2430/Games none bind 0 0
+/static_data/Games/Steam /home/novel2430/.local/share/Steam none bind 0 0

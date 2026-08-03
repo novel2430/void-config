@@ -2,24 +2,21 @@
 #
 # This recipe demonstrates the minimal v0 metadata and per-stage overrides.
 
-pkg_name="NerdFontsSymbols"
-pkg_version="3.4.0"
+pkg_name="noto-sans-fonts"
+pkg_version="2.015"
 pkg_mode="managed"
 pkg_type="artifact"
 
 stage_acquire() {
   al_fetch_cached_url \
-    "https://github.com/ryanoasis/nerd-fonts/releases/download/v$pkg_version/NerdFontsSymbolsOnly.zip" \
+    "https://github.com/notofonts/latin-greek-cyrillic/releases/download/NotoSans-v${pkg_version}/NotoSans-v${pkg_version}.zip" \
     "$WORKDIR/$pkg_name/$pkg_version.zip"
 }
 
 stage_prepare() {
   al_extract_archive_for_recipe \
     "$WORKDIR/$pkg_name/$pkg_version.zip" \
-    "$WORKDIR/$pkg_name/fonts"
-
-  rm -rf "$WORKDIR/$pkg_name/fonts/LICENSE.md"
-  rm -rf "$WORKDIR/$pkg_name/fonts/README.md"
+    "$WORKDIR/$pkg_name"
 
   SRCDIR="$WORKDIR/$pkg_name"
   BUILDDIR="$SRCDIR"
@@ -28,7 +25,6 @@ stage_prepare() {
 
 stage_stage() {
   al_stage_install_dir \
-    "$SRCDIR/fonts" \
-    "share/fonts/NerdFontsSymbols" \
-    644
+    "$SRCDIR" \
+    "share/fonts/noto-sans-fonts"
 }

@@ -1,2 +1,3 @@
 # Applications installed only
 net.agalwood.Motrix
+com.wps.Office

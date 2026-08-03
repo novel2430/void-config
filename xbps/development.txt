@@ -9,6 +9,7 @@ gdb
 cargo
 lld
 llvm
+openjdk21
 
 # Languages and tools
 python3

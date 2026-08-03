@@ -1,1 +1,6 @@
 # This file may remain empty.
+
+# Driver Stuff
+intel-video-accel
+libva-utils
+intel-gpu-tools

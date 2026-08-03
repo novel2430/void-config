@@ -3,7 +3,7 @@
 # This recipe demonstrates the minimal v0 metadata and per-stage overrides.
 
 pkg_name="my-dwl"
-pkg_version="375144e"
+pkg_version="07a829b"
 pkg_mode="managed"
 pkg_type="source"
 

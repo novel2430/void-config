@@ -4,3 +4,5 @@
 intel-video-accel
 libva-utils
 intel-gpu-tools
+
+tlp

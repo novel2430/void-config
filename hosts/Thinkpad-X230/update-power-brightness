@@ -1,0 +1,28 @@
+#!/bin/sh
+
+set -eu
+
+ac_online_file="/sys/class/power_supply/AC/online"
+backlight="/sys/class/backlight/intel_backlight"
+
+[ -r "$ac_online_file" ] || exit 0
+[ -d "$backlight" ] || exit 0
+
+MAX_BRIGHTNESS_VALUE=4438
+DIM_BRIGHTNESS_VALUE=888
+
+brightness=$MAX_BRIGHTNESS_VALUE
+
+case "$(cat "$ac_online_file")" in
+    1)
+        brightness=$MAX_BRIGHTNESS_VALUE
+        ;;
+    0)
+        brightness=$DIM_BRIGHTNESS_VALUE
+        ;;
+    *)
+        exit 0
+        ;;
+esac
+
+printf '%s\n' "$brightness" > "$backlight/brightness"

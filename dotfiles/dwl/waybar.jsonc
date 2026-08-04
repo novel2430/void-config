@@ -214,11 +214,11 @@
         "format": "{icon} {capacity}%",
         //"format-full": "{capacity}%",
         "format-charging": "󰠠 {capacity}%",
-        //"format-plugged": "{capacity}%",
+        "format-plugged": "󰠠 {capacity}%",
         //"format-alt": "{time} {icon}",
         //"format-good": "good",
         "format-full": "{icon} full",
-        "format-icons": ["", "", "", "", ""]
+        "format-icons": ["󰁺", "󰁾", "󰂀", "󰂂", "󰁹"]
     },
     "battery#bat2": {
         "bat": "BAT2"

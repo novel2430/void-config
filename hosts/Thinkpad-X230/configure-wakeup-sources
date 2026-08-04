@@ -1,0 +1,40 @@
+#!/bin/sh
+
+set -eu
+
+WAKEUP_TABLE=/proc/acpi/wakeup
+
+if [ ! -r "$WAKEUP_TABLE" ] || [ ! -w "$WAKEUP_TABLE" ]; then
+    printf '%s\n' \
+        "configure-wakeup-sources: $WAKEUP_TABLE is unavailable" >&2
+    exit 0
+fi
+
+disable_acpi_wakeup()
+{
+    device=$1
+
+    # /proc/acpi/wakeup is a toggle interface:
+    # write only when the device is currently enabled.
+    if grep -Eq "^${device}[[:space:]].*[[:space:]]\*enabled([[:space:]]|$)" \
+        "$WAKEUP_TABLE"
+    then
+        printf '%s\n' "$device" > "$WAKEUP_TABLE"
+    fi
+}
+
+# Policy:
+#
+# Suspend is entered explicitly through:
+#   rofi -> loginctl suspend
+#
+# Resume is intended to use:
+#   the physical power button
+#
+# Keep AC/power-related platform wake handling untouched.
+
+disable_acpi_wakeup LID
+disable_acpi_wakeup SLPB
+disable_acpi_wakeup XHCI
+disable_acpi_wakeup EHC1
+disable_acpi_wakeup EHC2

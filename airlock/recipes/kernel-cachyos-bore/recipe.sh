@@ -5,7 +5,7 @@ pkg_version="7.1"
 pkg_mode="managed"
 pkg_type="source"
 
-MINOR_VER=5
+MINOR_VER=6
 VER=1
 
 SRCNAME="cachyos-${pkg_version}.${MINOR_VER}-${VER}"
@@ -302,6 +302,7 @@ stage_stage() {
     mkdir -p "$bootdir"
 
     "${KMAKE[@]}" \
+      INSTALL_MOD_STRIP=1 \
       INSTALL_MOD_PATH="$STAGE_DIR" \
       modules_install
 

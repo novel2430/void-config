@@ -5,8 +5,8 @@ revert_dpms() {
     xset +dpms dpms 0 0 0
 }
 
-indicator_radius=90
-indicator_thickness=7
+indicator_radius=85
+indicator_thickness=6
 b_color="#3e5f44ff"
 f_color="#5e936cff"
 text_f_color="#eceff4ff"

@@ -2,3 +2,9 @@
 #
 # Keep this file minimal.
 # Do not grant every application access to home or host.
+--filesystem=/usr/share/icons:ro
+--filesystem=/usr/local/share/icons:ro
+--filesystem=/home/novel2430/.local/share/icons:ro
+--env=XCURSOR_PATH=/home/novel2430/.local/share/icons:/home/novel2430/.icons:/usr/local/share/icons:/usr/share/icons:/usr/share/pixmaps
+--env=XCURSOR_THEME=Bibata-Modern-Classic
+--env=XCURSOR_SIZE=24

@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+
+set -u
+
+case "${1:-}" in
+    store)
+        exec cliphist store
+        ;;
+
+    x11)
+        # 结束上一次负责持有 X11 CLIPBOARD 的 xclip。
+        pkill -x xclip 2>/dev/null || true
+
+        # wl-paste --watch 会把本次复制内容传到 stdin。
+        exec xclip \
+            -selection clipboard \
+            -in \
+            -target UTF8_STRING
+        ;;
+
+    *)
+        printf 'usage: %s {store|x11}\n' "$0" >&2
+        exit 2
+        ;;
+esac

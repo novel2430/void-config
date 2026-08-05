@@ -26,5 +26,5 @@ stage_prepare() {
 stage_stage() {
   al_stage_install_dir \
     "$SRCDIR/$pkg_name" \
-    "share/icons/$pkg_name"
+    "share/icons"
 }
